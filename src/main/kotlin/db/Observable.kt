@@ -47,6 +47,21 @@ abstract class Observable{
         }
     }
 
+    fun <T : Observable> observableList() : ReadWriteProperty<Any?, ObservableArrayList<T>>{
+//        val list = observableListOf()
+//        list.addListener { elementChangeType, t ->
+//            changed(property, oldValue, newValue)
+//        }
+        return object : ObservableProperty<ObservableArrayList<T>>(observableListOf()) {
+            override fun afterChange(property: KProperty<*>, oldValue: ObservableArrayList<T>, newValue: ObservableArrayList<T>) {
+                newValue.addListener { elementChangeType, t ->
+                    changed(property, oldValue, newValue)
+                }
+                changed(property, oldValue, newValue)
+            }
+        }
+    }
+
 }
 
 abstract class ChangeObserver<T : Observable>(val t: T){

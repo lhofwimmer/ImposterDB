@@ -6,7 +6,7 @@ enum class ElementChangeType{
     Add, Update, Remove
 }
 
-class ObservableArrayList<X : Observable>{
+class ObservableArrayList<X : Observable> : List<X>{
 
     constructor()
 
@@ -33,8 +33,6 @@ class ObservableArrayList<X : Observable>{
         collection.add(element)
         addHook(element)
         signalChanged(ElementChangeType.Add, element)
-//        element.updateHook = { l -> signalChanged(ElementChangeType.Update, l) }
-//        element.deleteHook = { l -> signalChanged(ElementChangeType.Remove, l) }
         return element
     }
 
@@ -52,8 +50,6 @@ class ObservableArrayList<X : Observable>{
             elements.forEach {
                 addHook(it)
                 signalChanged(ElementChangeType.Add, it)
-//                it.updateHook = { l -> signalChanged(ElementChangeType.Update, l) }
-//                it.deleteHook = { l -> signalChanged(ElementChangeType.Remove, l) }
             }
         }
         return added
@@ -66,18 +62,39 @@ class ObservableArrayList<X : Observable>{
         return b
     }
 
-    @Deprecated("")
-    fun update(element: X){
-        if(element in collection){
-            signalChanged(ElementChangeType.Update, element)
-        }
-    }
+    fun clone() = collection.toList()
 
-    fun list() = collection.toList()
+    override operator fun get(i : Int) = collection.get(i)
 
-    operator fun iterator() = list().iterator()
+    override val size: Int
+        get() = collection.size
 
-    operator fun get(i : Int) = collection.get(i)
+    override fun iterator() =
+        collection.iterator()
+
+    override fun contains(element: X) =
+        collection.contains(element)
+
+    override fun containsAll(elements: Collection<X>) =
+        collection.containsAll(elements)
+
+    override fun indexOf(element: X) =
+        collection.indexOf(element)
+
+    override fun isEmpty() =
+        collection.isEmpty()
+
+    override fun lastIndexOf(element: X)=
+        collection.lastIndexOf(element)
+
+    override fun listIterator() =
+        collection.listIterator()
+
+    override fun listIterator(index: Int) =
+        collection.listIterator(index)
+
+    override fun subList(fromIndex: Int, toIndex: Int) =
+        throw IllegalAccessException("Not available on ObservableList")
 
 }
 
@@ -89,3 +106,5 @@ class GenericChangeObserver <X : Observable> (t : X, val f: () -> Unit) : Change
 }
 
 fun <X : Observable> observableListOf(vararg initial: X) = ObservableArrayList(*initial)
+
+fun <X : Observable> observableListOf() = ObservableArrayList<X>()

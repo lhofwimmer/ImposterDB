@@ -3,6 +3,7 @@ package example
 import db.ChangeObserver
 import db.DB
 import db.Observable
+import db.ObservableArrayList
 
 class Person : Observable(){
 
@@ -10,6 +11,15 @@ class Person : Observable(){
 
     var description: String? by observable(null)
 
+    var tags: ObservableArrayList<Tag> by observableList()
+
+}
+
+class Tag() : Observable(){
+    constructor(tag: String) : this(){
+        this.tag = tag
+    }
+    var tag : String by observable("")
 }
 
 class PersonObserver(t: Person) : ChangeObserver<Person>(t){
@@ -34,6 +44,9 @@ fun main() {
 
     obj.description = "This is some random stuff"
 
+    obj.tags.add(Tag("Hallo"))
+    obj.tags.add(Tag("Yay"))
+
     val list = DB.getList<Person>("persons")
 
     val p1 = Person()
@@ -47,6 +60,9 @@ fun main() {
 
     p2.name = "John Miller 3"
     p2.description = "Something else"
+
+    p2.tags.add(Tag("Hallo"))
+    p2.tags.add(Tag("Yay"))
 
     // #####
     //look into data/tournaments.json

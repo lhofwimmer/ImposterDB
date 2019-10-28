@@ -68,4 +68,8 @@ fun main() {
     //look into data/tournaments.json
     // #####
 
+    DB.commit {
+        p2.name = "John Doe"
+    }
+
 }

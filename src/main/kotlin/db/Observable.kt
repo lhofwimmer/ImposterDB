@@ -24,10 +24,14 @@ abstract class Observable{
         println("${prop.name}: $old -> $new")
         if(listeners.containsKey(prop.name)){
             val list = listeners[prop.name]!! as List<ChangeListener<T>>
-            list.forEach { it(prop, old, new) }
+            list.forEach {
+                DB.changed[it] = ChangeProperty(prop,old,new)
+            }
         }
-        DB.changedObjects.add(ChangeProperty(prop,old,new))
-        (classListeners as List<ChangeListener<T>>).forEach { it(prop, old, new) }
+
+        (classListeners as List<ChangeListener<T>>).forEach {
+            DB.changed[it] = ChangeProperty(prop,old,new)
+        }
     }
 
     fun <T> addListener(prop: KProperty<T>, listener: ChangeListener<T>){
@@ -82,12 +86,10 @@ abstract class ChangeObserver<T : Observable>(val t: T){
             if(function.name == "all"){
                 t.addListener<Any>{ prop, old, new ->
                     if(old != new){
-                        if(function.parameters.size == 4){  //TODO Can be optimized to call by parameter types
-                            function.call(this, prop, old, new)
-                        }else if(function.parameters.size == 3){
-                            function.call(this, prop, new)
-                        }else if(function.parameters.size == 2){
-                            function.call(this, new)
+                        when {
+                            function.parameters.size == 4 -> function.call(this, prop, old, new) //TODO Can be optimized to call by parameter types
+                            function.parameters.size == 3 -> function.call(this, prop, new)
+                            function.parameters.size == 2 -> function.call(this, new)
                         }
                     }
                 }

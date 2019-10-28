@@ -39,21 +39,22 @@ object DB{
             file.writeText(s)
         }
 
-        parsed.put(key, list)
+        parsed[key] = list
 
         return list
 
     }
 
-    val changedObjects = mutableListOf<ChangeProperty<*>>()
-    fun tx(transaction: () -> Unit) {
+    val changed = mutableMapOf<ChangeListener<Any?>, ChangeProperty<*>>()
+    fun commit(transaction: () -> Unit) {
         transaction()
         try {
-            changedObjects.forEach {
-
+            changed.forEach {
+                it.key(it.value.prop, it.value.old, it.value.new)
             }
         } catch(ex: Exception) {
-            changedObjects.forEach {
+            changed.forEach {
+                it.key(it.value.prop, it.value.old, it.value.old)
             }
         }
     }
@@ -77,7 +78,7 @@ object DB{
             file.writeText(s)
         }.all("")
 
-        parsedObjects.put(key, obj)
+        parsedObjects[key] = obj
 
         return obj
 

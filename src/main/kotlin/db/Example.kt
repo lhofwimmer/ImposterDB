@@ -33,5 +33,9 @@ fun main() {
     t.name = "New Tournament"
 
     //look into data/tournaments.json
+//    DB.tx {
+//        t.description = "20 Years"
+//        t.name = "New Tournament"
+//    }
 
 }

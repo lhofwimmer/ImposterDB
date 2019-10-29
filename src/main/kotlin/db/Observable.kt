@@ -25,12 +25,12 @@ abstract class Observable{
         if(listeners.containsKey(prop.name)){
             val list = listeners[prop.name]!! as List<ChangeListener<T>>
             list.forEach {
-                DB.changed[it] = ChangeProperty(prop,old,new)
+                DB.changed[(it as ChangeListener<Any?>)] = ChangeProperty(prop,old,new)
             }
         }
 
         (classListeners as List<ChangeListener<T>>).forEach {
-            DB.changed[it] = ChangeProperty(prop,old,new)
+            DB.changed[it as ChangeListener<Any?>] = ChangeProperty(prop,old,new)
         }
     }
 
